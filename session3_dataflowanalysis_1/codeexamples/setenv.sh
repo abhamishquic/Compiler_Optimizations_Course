@@ -1,2 +1,2 @@
-export PATH=$(HOME)/software/llvm-project/build/bin:$PATH
-export PATH=$(HOME)/software/llvm-project/build/include:$PATH
+export PATH=/local/mnt/workspace/llvm-project/build/debug/bin:$PATH
+export PATH=/local/mnt/workspace/llvm-project/build/debug/include:$PATH
