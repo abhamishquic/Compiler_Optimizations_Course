@@ -113,35 +113,35 @@
 typedef struct
 {
    // lexer variables
-   char *input_stream;
-   char *eof;
-   char *parse_point;
-   char *string_storage;
-   int   string_storage_len;
+   char *InputStream;
+   char *Eof;
+   char *ParsePoint;
+   char *StringStorage;
+   int   StringStorageLen;
 
    // lexer parse location for error messages
-   char *where_firstchar;
-   char *where_lastchar;
+   char *WhereFirstchar;
+   char *WhereLastchar;
 
    // lexer token variables
-   long token;
-   double real_number;
-   long   int_number;
-   char *string;
-   int string_len;
+   long Token;
+   double RealNumber;
+   long   IntNumber;
+   char *String;
+   int StringLen;
 } stb_lexer;
 
 typedef struct
 {
-   int line_number;
-   int line_offset;
+   int LineNumber;
+   int LineOffset;
 } stb_lex_location;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-extern void stb_c_lexer_init(stb_lexer *lexer, const char *input_stream, const char *input_stream_end, char *string_store, int store_length);
+extern void stbCLexerInit(stb_lexer *Lexer, const char *InputStream, const char *InputStreamEnd, char *StringStore, int StoreLength);
 // this function initialize the 'lexer' structure
 //   Input:
 //   - input_stream points to the file to parse, loaded into memory
@@ -149,7 +149,7 @@ extern void stb_c_lexer_init(stb_lexer *lexer, const char *input_stream, const c
 //   - string_store is storage the lexer can use for storing parsed strings and identifiers
 //   - store_length is the length of that storage
 
-extern int stb_c_lexer_get_token(stb_lexer *lexer);
+extern int stbCLexerGetToken(stb_lexer *Lexer);
 // this function returns non-zero if a token is parsed, or 0 if at EOF
 //   Output:
 //   - lexer->token is the token ID, which is unicode code point for a single-char token, < 0 for a multichar or eof or error
@@ -158,7 +158,7 @@ extern int stb_c_lexer_get_token(stb_lexer *lexer);
 //   - lexer->string is a 0-terminated string for CLEX_dqstring or CLEX_sqstring or CLEX_identifier
 //   - lexer->string_len is the byte length of lexer->string
 
-extern void stb_c_lexer_get_location(const stb_lexer *lexer, const char *where, stb_lex_location *loc);
+extern void stbCLexerGetLocation(const stb_lexer *Lexer, const char *Where, stb_lex_location *Loc);
 // this inefficient function returns the line number and character offset of a
 // given location in the file as returned by stb_lex_token. Because it's inefficient,
 // you should only call it for errors, not for every token.
@@ -270,67 +270,67 @@ typedef long       stb__clex_int;
 #define N(a)
 
 // API function
-void stb_c_lexer_init(stb_lexer *lexer, const char *input_stream, const char *input_stream_end, char *string_store, int store_length)
+void stbCLexerInit(stb_lexer *Lexer, const char *InputStream, const char *InputStreamEnd, char *StringStore, int StoreLength)
 {
-   lexer->input_stream = (char *) input_stream;
-   lexer->eof = (char *) input_stream_end;
-   lexer->parse_point = (char *) input_stream;
-   lexer->string_storage = string_store;
-   lexer->string_storage_len = store_length;
+   Lexer->InputStream = (char *) InputStream;
+   Lexer->Eof = (char *) InputStreamEnd;
+   Lexer->ParsePoint = (char *) InputStream;
+   Lexer->StringStorage = StringStore;
+   Lexer->StringStorageLen = StoreLength;
 }
 
 // API function
-void stb_c_lexer_get_location(const stb_lexer *lexer, const char *where, stb_lex_location *loc)
+void stbCLexerGetLocation(const stb_lexer *Lexer, const char *Where, stb_lex_location *Loc)
 {
-   char *p = lexer->input_stream;
-   int line_number = 1;
-   int char_offset = 0;
-   while (*p && p < where) {
-      if (*p == '\n' || *p == '\r') {
-         p += (p[0]+p[1] == '\r'+'\n' ? 2 : 1); // skip newline
-         line_number += 1;
-         char_offset = 0;
+   char *P = Lexer->InputStream;
+   int LineNumber = 1;
+   int CharOffset = 0;
+   while (*P && P < Where) {
+      if (*P == '\n' || *P == '\r') {
+         P += (P[0]+P[1] == '\r'+'\n' ? 2 : 1); // skip newline
+         LineNumber += 1;
+         CharOffset = 0;
       } else {
-         ++p;
-         ++char_offset;
+         ++P;
+         ++CharOffset;
       }
    }
-   loc->line_number = line_number;
-   loc->line_offset = char_offset;
+   Loc->LineNumber = LineNumber;
+   Loc->LineOffset = CharOffset;
 }
 
 // main helper function for returning a parsed token
-static int stb__clex_token(stb_lexer *lexer, int token, char *start, char *end)
+static int stbClexToken(stb_lexer *Lexer, int Token, char *Start, char *End)
 {
-   lexer->token = token;
-   lexer->where_firstchar = start;
-   lexer->where_lastchar = end;
-   lexer->parse_point = end+1;
+   Lexer->Token = Token;
+   Lexer->WhereFirstchar = Start;
+   Lexer->WhereLastchar = End;
+   Lexer->ParsePoint = End+1;
    return 1;
 }
 
 // helper function for returning eof
-static int stb__clex_eof(stb_lexer *lexer)
+static int stbClexEof(stb_lexer *Lexer)
 {
-   lexer->token = CLEX_eof;
+   Lexer->Token = CLEX_eof;
    return 0;
 }
 
-static int stb__clex_iswhite(int x)
+static int stbClexIswhite(int X)
 {
-   return x == ' ' || x == '\t' || x == '\r' || x == '\n' || x == '\f';
+   return X == ' ' || X == '\t' || X == '\r' || X == '\n' || X == '\f';
 }
 
-static const char *stb__strchr(const char *str, int ch)
+static const char *stbStrchr(const char *Str, int Ch)
 {
-   for (; *str; ++str)
-      if (*str == ch)
-         return str;
+   for (; *Str; ++Str)
+      if (*Str == Ch)
+         return Str;
    return 0;
 }
 
 // parse suffixes at the end of a number
-static int stb__clex_parse_suffixes(stb_lexer *lexer, long tokenid, char *start, char *cur, const char *suffixes)
+static int stbClexParseSuffixes(stb_lexer *Lexer, long Tokenid, char *Start, char *Cur, const char *Suffixes)
 {
    #ifdef STB__clex_parse_suffixes
    lexer->string = lexer->string_storage;
@@ -344,9 +344,9 @@ static int stb__clex_parse_suffixes(stb_lexer *lexer, long tokenid, char *start,
       lexer->string[lexer->string_len++] = *cur++;
    }
    #else
-   suffixes = suffixes; // attempt to suppress warnings
+   Suffixes = Suffixes; // attempt to suppress warnings
    #endif
-   return stb__clex_token(lexer, tokenid, start, cur-1);
+   return stbClexToken(Lexer, Tokenid, Start, Cur-1);
 }
 
 #ifndef STB__CLEX_use_stdlib
@@ -445,11 +445,11 @@ static double stb__clex_parse_float(char *p, char **q)
 }
 #endif
 
-static int stb__clex_parse_char(char *p, char **q)
+static int stbClexParseChar(char *P, char **Q)
 {
-   if (*p == '\\') {
-      *q = p+2; // tentatively guess we'll parse two characters
-      switch(p[1]) {
+   if (*P == '\\') {
+      *Q = P+2; // tentatively guess we'll parse two characters
+      switch(P[1]) {
          case '\\': return '\\';
          case '\'': return '\'';
          case '"': return '"';
@@ -462,42 +462,42 @@ static int stb__clex_parse_char(char *p, char **q)
          case 'u': return -1; // @TODO unicode constants
       }
    }
-   *q = p+1;
-   return (unsigned char) *p;
+   *Q = P+1;
+   return (unsigned char) *P;
 }
 
-static int stb__clex_parse_string(stb_lexer *lexer, char *p, int type)
+static int stbClexParseString(stb_lexer *Lexer, char *P, int Type)
 {
-   char *start = p;
-   char delim = *p++; // grab the " or ' for later matching
-   char *out = lexer->string_storage;
-   char *outend = lexer->string_storage + lexer->string_storage_len;
-   while (*p != delim) {
-      int n;
-      if (*p == '\\') {
-         char *q;
-         n = stb__clex_parse_char(p, &q);
-         if (n < 0)
-            return stb__clex_token(lexer, CLEX_parse_error, start, q);
-         p = q;
+   char *Start = P;
+   char Delim = *P++; // grab the " or ' for later matching
+   char *Out = Lexer->StringStorage;
+   char *Outend = Lexer->StringStorage + Lexer->StringStorageLen;
+   while (*P != Delim) {
+      int K;
+      if (*P == '\\') {
+         char *Q;
+         K = stbClexParseChar(P, &Q);
+         if (K < 0)
+            return stbClexToken(Lexer, CLEX_parse_error, Start, Q);
+         P = Q;
       } else {
          // @OPTIMIZE: could speed this up by looping-while-not-backslash
-         n = (unsigned char) *p++;
+         K = (unsigned char) *P++;
       }
-      if (out+1 > outend)
-         return stb__clex_token(lexer, CLEX_parse_error, start, p);
+      if (Out+1 > Outend)
+         return stbClexToken(Lexer, CLEX_parse_error, Start, P);
       // @TODO expand unicode escapes to UTF8
-      *out++ = (char) n;
+      *Out++ = (char) K;
    }
-   *out = 0;
-   lexer->string = lexer->string_storage;
-   lexer->string_len = (int) (out - lexer->string_storage);
-   return stb__clex_token(lexer, type, start, p);
+   *Out = 0;
+   Lexer->String = Lexer->StringStorage;
+   Lexer->StringLen = (int) (Out - Lexer->StringStorage);
+   return stbClexToken(Lexer, Type, Start, P);
 }
 
-int stb_c_lexer_get_token(stb_lexer *lexer)
+int stbCLexerGetToken(stb_lexer *Lexer)
 {
-   char *p = lexer->parse_point;
+   char *P = Lexer->ParsePoint;
 
    // skip whitespace and comments
    for (;;) {
@@ -511,27 +511,27 @@ int stb_c_lexer_get_token(stb_lexer *lexer)
          p += n;
       }
       #else
-      while (p != lexer->eof && stb__clex_iswhite(*p))
-         ++p;
+      while (P != Lexer->Eof && stbClexIswhite(*P))
+         ++P;
       #endif
 
       STB_C_LEX_CPP_COMMENTS(
-         if (p != lexer->eof && p[0] == '/' && p[1] == '/') {
-            while (p != lexer->eof && *p != '\r' && *p != '\n')
-               ++p;
+         if (P != Lexer->Eof && P[0] == '/' && P[1] == '/') {
+            while (P != Lexer->Eof && *P != '\r' && *P != '\n')
+               ++P;
             continue;
          }
       )
 
       STB_C_LEX_C_COMMENTS(
-         if (p != lexer->eof && p[0] == '/' && p[1] == '*') {
-            char *start = p;
-            p += 2;
-            while (p != lexer->eof && (p[0] != '*' || p[1] != '/'))
-               ++p;
-            if (p == lexer->eof)
-               return stb__clex_token(lexer, CLEX_parse_error, start, p-1);
-            p += 2;
+         if (P != Lexer->Eof && P[0] == '/' && P[1] == '*') {
+            char *Start = P;
+            P += 2;
+            while (P != Lexer->Eof && (P[0] != '*' || P[1] != '/'))
+               ++P;
+            if (P == Lexer->Eof)
+               return stbClexToken(Lexer, CLEX_parse_error, Start, P-1);
+            P += 2;
             continue;
          }
       )
@@ -541,9 +541,9 @@ int stb_c_lexer_get_token(stb_lexer *lexer)
          // of where in the line the # is, rather than requiring it
          // be at the start. (because this parser doesn't otherwise
          // check for line breaks!)
-         if (p != lexer->eof && p[0] == '#') {
-            while (p != lexer->eof && *p != '\r' && *p != '\n')
-               ++p;
+         if (P != Lexer->Eof && P[0] == '#') {
+            while (P != Lexer->Eof && *P != '\r' && *P != '\n')
+               ++P;
             continue;
          }
       #endif
@@ -551,33 +551,33 @@ int stb_c_lexer_get_token(stb_lexer *lexer)
       break;
    }
 
-   if (p == lexer->eof)
-      return stb__clex_eof(lexer);
+   if (P == Lexer->Eof)
+      return stbClexEof(Lexer);
 
-   switch (*p) {
+   switch (*P) {
       default:
-         if (   (*p >= 'a' && *p <= 'z')
-             || (*p >= 'A' && *p <= 'Z')
-             || *p == '_' || (unsigned char) *p >= 128    // >= 128 is UTF8 char
-             STB_C_LEX_DOLLAR_IDENTIFIER( || *p == '$' ) )
+         if (   (*P >= 'a' && *P <= 'z')
+             || (*P >= 'A' && *P <= 'Z')
+             || *P == '_' || (unsigned char) *P >= 128    // >= 128 is UTF8 char
+             STB_C_LEX_DOLLAR_IDENTIFIER( || *P == '$' ) )
          {
-            int n = 0;
-            lexer->string = lexer->string_storage;
+            int K = 0;
+            Lexer->String = Lexer->StringStorage;
             do {
-               if (n+1 >= lexer->string_storage_len)
-                  return stb__clex_token(lexer, CLEX_parse_error, p, p+n);
-               lexer->string[n] = p[n];
-               ++n;
+               if (K+1 >= Lexer->StringStorageLen)
+                  return stbClexToken(Lexer, CLEX_parse_error, P, P+K);
+               Lexer->String[K] = P[K];
+               ++K;
             } while (
-                  (p[n] >= 'a' && p[n] <= 'z')
-               || (p[n] >= 'A' && p[n] <= 'Z')
-               || (p[n] >= '0' && p[n] <= '9') // allow digits in middle of identifier
-               || p[n] == '_' || (unsigned char) p[n] >= 128
-                STB_C_LEX_DOLLAR_IDENTIFIER( || p[n] == '$' )
+                  (P[K] >= 'a' && P[K] <= 'z')
+               || (P[K] >= 'A' && P[K] <= 'Z')
+               || (P[K] >= '0' && P[K] <= '9') // allow digits in middle of identifier
+               || P[K] == '_' || (unsigned char) P[K] >= 128
+                STB_C_LEX_DOLLAR_IDENTIFIER( || P[K] == '$' )
             );
-            lexer->string[n] = 0;
-            lexer->string_len = n;
-            return stb__clex_token(lexer, CLEX_id, p, p+n-1);
+            Lexer->String[K] = 0;
+            Lexer->StringLen = K;
+            return stbClexToken(Lexer, CLEX_id, P, P+K-1);
          }
 
          // check for EOF
@@ -588,99 +588,99 @@ int stb_c_lexer_get_token(stb_lexer *lexer)
 
       single_char:
          // not an identifier, return the character as itself
-         return stb__clex_token(lexer, *p, p, p);
+         return stbClexToken(Lexer, *P, P, P);
 
       case '+':
-         if (p+1 != lexer->eof) {
-            STB_C_LEX_C_INCREMENTS(if (p[1] == '+') return stb__clex_token(lexer, CLEX_plusplus, p,p+1);)
-            STB_C_LEX_C_ARITHEQ(   if (p[1] == '=') return stb__clex_token(lexer, CLEX_pluseq  , p,p+1);)
+         if (P+1 != Lexer->Eof) {
+            STB_C_LEX_C_INCREMENTS(if (P[1] == '+') return stbClexToken(Lexer, CLEX_plusplus, P,P+1);)
+            STB_C_LEX_C_ARITHEQ(   if (P[1] == '=') return stbClexToken(Lexer, CLEX_pluseq  , P,P+1);)
          }
          goto single_char;
       case '-':
-         if (p+1 != lexer->eof) {
-            STB_C_LEX_C_INCREMENTS(if (p[1] == '-') return stb__clex_token(lexer, CLEX_minusminus, p,p+1);)
-            STB_C_LEX_C_ARITHEQ(   if (p[1] == '=') return stb__clex_token(lexer, CLEX_minuseq   , p,p+1);)
-            STB_C_LEX_C_ARROW(     if (p[1] == '>') return stb__clex_token(lexer, CLEX_arrow     , p,p+1);)
+         if (P+1 != Lexer->Eof) {
+            STB_C_LEX_C_INCREMENTS(if (P[1] == '-') return stbClexToken(Lexer, CLEX_minusminus, P,P+1);)
+            STB_C_LEX_C_ARITHEQ(   if (P[1] == '=') return stbClexToken(Lexer, CLEX_minuseq   , P,P+1);)
+            STB_C_LEX_C_ARROW(     if (P[1] == '>') return stbClexToken(Lexer, CLEX_arrow     , P,P+1);)
          }
          goto single_char;
       case '&':
-         if (p+1 != lexer->eof) {
-            STB_C_LEX_C_LOGICAL(  if (p[1] == '&') return stb__clex_token(lexer, CLEX_andand, p,p+1);)
-            STB_C_LEX_C_BITWISEEQ(if (p[1] == '=') return stb__clex_token(lexer, CLEX_andeq , p,p+1);)
+         if (P+1 != Lexer->Eof) {
+            STB_C_LEX_C_LOGICAL(  if (P[1] == '&') return stbClexToken(Lexer, CLEX_andand, P,P+1);)
+            STB_C_LEX_C_BITWISEEQ(if (P[1] == '=') return stbClexToken(Lexer, CLEX_andeq , P,P+1);)
          }
          goto single_char;
       case '|':
-         if (p+1 != lexer->eof) {
-            STB_C_LEX_C_LOGICAL(  if (p[1] == '|') return stb__clex_token(lexer, CLEX_oror, p,p+1);)
-            STB_C_LEX_C_BITWISEEQ(if (p[1] == '=') return stb__clex_token(lexer, CLEX_oreq, p,p+1);)
+         if (P+1 != Lexer->Eof) {
+            STB_C_LEX_C_LOGICAL(  if (P[1] == '|') return stbClexToken(Lexer, CLEX_oror, P,P+1);)
+            STB_C_LEX_C_BITWISEEQ(if (P[1] == '=') return stbClexToken(Lexer, CLEX_oreq, P,P+1);)
          }
          goto single_char;
       case '=':
-         if (p+1 != lexer->eof) {
-            STB_C_LEX_C_COMPARISONS(if (p[1] == '=') return stb__clex_token(lexer, CLEX_eq, p,p+1);)
+         if (P+1 != Lexer->Eof) {
+            STB_C_LEX_C_COMPARISONS(if (P[1] == '=') return stbClexToken(Lexer, CLEX_eq, P,P+1);)
             STB_C_LEX_EQUAL_ARROW(  if (p[1] == '>') return stb__clex_token(lexer, CLEX_eqarrow, p,p+1);)
          }
          goto single_char;
       case '!':
-         STB_C_LEX_C_COMPARISONS(if (p+1 != lexer->eof && p[1] == '=') return stb__clex_token(lexer, CLEX_noteq, p,p+1);)
+         STB_C_LEX_C_COMPARISONS(if (P+1 != Lexer->Eof && P[1] == '=') return stbClexToken(Lexer, CLEX_noteq, P,P+1);)
          goto single_char;
       case '^':
-         STB_C_LEX_C_BITWISEEQ(if (p+1 != lexer->eof && p[1] == '=') return stb__clex_token(lexer, CLEX_xoreq, p,p+1));
+         STB_C_LEX_C_BITWISEEQ(if (P+1 != Lexer->Eof && P[1] == '=') return stbClexToken(Lexer, CLEX_xoreq, P,P+1));
          goto single_char;
       case '%':
-         STB_C_LEX_C_ARITHEQ(if (p+1 != lexer->eof && p[1] == '=') return stb__clex_token(lexer, CLEX_modeq, p,p+1));
+         STB_C_LEX_C_ARITHEQ(if (P+1 != Lexer->Eof && P[1] == '=') return stbClexToken(Lexer, CLEX_modeq, P,P+1));
          goto single_char;
       case '*':
-         STB_C_LEX_C_ARITHEQ(if (p+1 != lexer->eof && p[1] == '=') return stb__clex_token(lexer, CLEX_muleq, p,p+1));
+         STB_C_LEX_C_ARITHEQ(if (P+1 != Lexer->Eof && P[1] == '=') return stbClexToken(Lexer, CLEX_muleq, P,P+1));
          goto single_char;
       case '/':
-         STB_C_LEX_C_ARITHEQ(if (p+1 != lexer->eof && p[1] == '=') return stb__clex_token(lexer, CLEX_diveq, p,p+1));
+         STB_C_LEX_C_ARITHEQ(if (P+1 != Lexer->Eof && P[1] == '=') return stbClexToken(Lexer, CLEX_diveq, P,P+1));
          goto single_char;
       case '<':
-         if (p+1 != lexer->eof) {
-            STB_C_LEX_C_COMPARISONS(if (p[1] == '=') return stb__clex_token(lexer, CLEX_lesseq, p,p+1);)
-            STB_C_LEX_C_SHIFTS(     if (p[1] == '<') {
-                                       STB_C_LEX_C_ARITHEQ(if (p+2 != lexer->eof && p[2] == '=')
-                                                              return stb__clex_token(lexer, CLEX_shleq, p,p+2);)
-                                       return stb__clex_token(lexer, CLEX_shl, p,p+1);
+         if (P+1 != Lexer->Eof) {
+            STB_C_LEX_C_COMPARISONS(if (P[1] == '=') return stbClexToken(Lexer, CLEX_lesseq, P,P+1);)
+            STB_C_LEX_C_SHIFTS(     if (P[1] == '<') {
+                                       STB_C_LEX_C_ARITHEQ(if (P+2 != Lexer->Eof && P[2] == '=')
+                                                              return stbClexToken(Lexer, CLEX_shleq, P,P+2);)
+                                       return stbClexToken(Lexer, CLEX_shl, P,P+1);
                                     }
                               )
          }
          goto single_char;
       case '>':
-         if (p+1 != lexer->eof) {
-            STB_C_LEX_C_COMPARISONS(if (p[1] == '=') return stb__clex_token(lexer, CLEX_greatereq, p,p+1);)
-            STB_C_LEX_C_SHIFTS(     if (p[1] == '>') {
-                                       STB_C_LEX_C_ARITHEQ(if (p+2 != lexer->eof && p[2] == '=')
-                                                              return stb__clex_token(lexer, CLEX_shreq, p,p+2);)
-                                       return stb__clex_token(lexer, CLEX_shr, p,p+1);
+         if (P+1 != Lexer->Eof) {
+            STB_C_LEX_C_COMPARISONS(if (P[1] == '=') return stbClexToken(Lexer, CLEX_greatereq, P,P+1);)
+            STB_C_LEX_C_SHIFTS(     if (P[1] == '>') {
+                                       STB_C_LEX_C_ARITHEQ(if (P+2 != Lexer->Eof && P[2] == '=')
+                                                              return stbClexToken(Lexer, CLEX_shreq, P,P+2);)
+                                       return stbClexToken(Lexer, CLEX_shr, P,P+1);
                                     }
                               )
          }
          goto single_char;
 
       case '"':
-         STB_C_LEX_C_DQ_STRINGS(return stb__clex_parse_string(lexer, p, CLEX_dqstring);)
+         STB_C_LEX_C_DQ_STRINGS(return stbClexParseString(Lexer, P, CLEX_dqstring);)
          goto single_char;
       case '\'':
          STB_C_LEX_C_SQ_STRINGS(return stb__clex_parse_string(lexer, p, CLEX_sqstring);)
          STB_C_LEX_C_CHARS(
          {
-            char *start = p;
-            lexer->int_number = stb__clex_parse_char(p+1, &p);
-            if (lexer->int_number < 0)
-               return stb__clex_token(lexer, CLEX_parse_error, start,start);
-            if (p == lexer->eof || *p != '\'')
-               return stb__clex_token(lexer, CLEX_parse_error, start,p);
-            return stb__clex_token(lexer, CLEX_charlit, start, p+1);
+            char *Start = P;
+            Lexer->IntNumber = stbClexParseChar(P+1, &P);
+            if (Lexer->IntNumber < 0)
+               return stbClexToken(Lexer, CLEX_parse_error, Start,Start);
+            if (P == Lexer->Eof || *P != '\'')
+               return stbClexToken(Lexer, CLEX_parse_error, Start,P);
+            return stbClexToken(Lexer, CLEX_charlit, Start, P+1);
          })
          goto single_char;
 
       case '0':
          #if defined(STB__clex_hex_ints) || defined(STB__clex_hex_floats)
-            if (p+1 != lexer->eof) {
-               if (p[1] == 'x' || p[1] == 'X') {
-                  char *q;
+            if (P+1 != Lexer->Eof) {
+               if (P[1] == 'x' || P[1] == 'X') {
+                  char *Q;
 
                   #ifdef STB__clex_hex_floats
                   for (q=p+2;
@@ -704,7 +704,7 @@ int stb_c_lexer_get_token(stb_lexer *lexer)
 
                   #ifdef STB__clex_hex_ints
                   #ifdef STB__CLEX_use_stdlib
-                  lexer->int_number = strtol((char *) p, (char **) &q, 16);
+                  Lexer->IntNumber = strtol((char *) P, (char **) &Q, 16);
                   #else
                   {
                      stb__clex_int n=0;
@@ -721,9 +721,9 @@ int stb_c_lexer_get_token(stb_lexer *lexer)
                      lexer->int_number = n;
                   }
                   #endif
-                  if (q == p+2)
-                     return stb__clex_token(lexer, CLEX_parse_error, p-2,p-1);
-                  return stb__clex_parse_suffixes(lexer, CLEX_intlit, p,q, STB_C_LEX_HEX_SUFFIXES);
+                  if (Q == P+2)
+                     return stbClexToken(Lexer, CLEX_parse_error, P-2,P-1);
+                  return stbClexParseSuffixes(Lexer, CLEX_intlit, P,Q, STB_C_LEX_HEX_SUFFIXES);
                   #endif
                }
             }
@@ -736,18 +736,18 @@ int stb_c_lexer_get_token(stb_lexer *lexer)
 
          #ifdef STB__clex_decimal_floats
          {
-            char *q = p;
-            while (q != lexer->eof && (*q >= '0' && *q <= '9'))
-               ++q;
-            if (q != lexer->eof) {
-               if (*q == '.' STB_C_LEX_FLOAT_NO_DECIMAL(|| *q == 'e' || *q == 'E')) {
+            char *Q = P;
+            while (Q != Lexer->Eof && (*Q >= '0' && *Q <= '9'))
+               ++Q;
+            if (Q != Lexer->Eof) {
+               if (*Q == '.' STB_C_LEX_FLOAT_NO_DECIMAL(|| *Q == 'e' || *Q == 'E')) {
                   #ifdef STB__CLEX_use_stdlib
-                  lexer->real_number = strtod((char *) p, (char**) &q);
+                  Lexer->RealNumber = strtod((char *) P, (char**) &Q);
                   #else
                   lexer->real_number = stb__clex_parse_float(p, &q);
                   #endif
 
-                  return stb__clex_parse_suffixes(lexer, CLEX_floatlit, p,q, STB_C_LEX_FLOAT_SUFFIXES);
+                  return stbClexParseSuffixes(Lexer, CLEX_floatlit, P,Q, STB_C_LEX_FLOAT_SUFFIXES);
 
                }
             }
@@ -755,10 +755,10 @@ int stb_c_lexer_get_token(stb_lexer *lexer)
          #endif // STB__clex_decimal_floats
 
          #ifdef STB__clex_octal_ints
-         if (p[0] == '0') {
-            char *q = p;
+         if (P[0] == '0') {
+            char *Q = P;
             #ifdef STB__CLEX_use_stdlib
-            lexer->int_number = strtol((char *) p, (char **) &q, 8);
+            Lexer->IntNumber = strtol((char *) P, (char **) &Q, 8);
             #else
             stb__clex_int n=0;
             while (q != lexer->eof) {
@@ -772,15 +772,15 @@ int stb_c_lexer_get_token(stb_lexer *lexer)
                return stb__clex_token(lexer, CLEX_parse_error, p, q);
             lexer->int_number = n;
             #endif
-            return stb__clex_parse_suffixes(lexer, CLEX_intlit, p,q, STB_C_LEX_OCTAL_SUFFIXES);
+            return stbClexParseSuffixes(Lexer, CLEX_intlit, P,Q, STB_C_LEX_OCTAL_SUFFIXES);
          }
          #endif // STB__clex_octal_ints
 
          #ifdef STB__clex_decimal_ints
          {
-            char *q = p;
+            char *Q = P;
             #ifdef STB__CLEX_use_stdlib
-            lexer->int_number = strtol((char *) p, (char **) &q, 10);
+            Lexer->IntNumber = strtol((char *) P, (char **) &Q, 10);
             #else
             stb__clex_int n=0;
             while (q != lexer->eof) {
@@ -792,7 +792,7 @@ int stb_c_lexer_get_token(stb_lexer *lexer)
             }
             lexer->int_number = n;
             #endif
-            return stb__clex_parse_suffixes(lexer, CLEX_intlit, p,q, STB_C_LEX_OCTAL_SUFFIXES);
+            return stbClexParseSuffixes(Lexer, CLEX_intlit, P,Q, STB_C_LEX_OCTAL_SUFFIXES);
          }
          #endif // STB__clex_decimal_ints
          goto single_char;
