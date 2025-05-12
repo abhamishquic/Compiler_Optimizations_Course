@@ -1,4 +1,8 @@
-mkdir -p build
-cmake -G "Ninja" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -B build .
-cd build
+SRC_DIR=${1:-.}
+BUILD_DIR=${2:-build}
+BUILD_TYPE=${3:-Debug}
+mkdir -p $BUILD_DIR
+
+cmake -G "Ninja" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_BUILD_TYPE=$BUILD_TYPE -B build -S $SRC_DIR
+cd $BUILD_DIR
 ninja
